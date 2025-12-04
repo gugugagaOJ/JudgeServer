@@ -81,6 +81,15 @@ jobs:
       
       - name: Get the changelog
         run: echo "${{ steps.changelog.outputs.changelog }}"
+
+      - name: Check for pre-release
+        id: check_prerelease
+        run: |
+          if [[ "${{ github.ref_name }}" == *"-beta"* ]]; then
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          fi
         
       - name: get first tag
         id: tag
@@ -94,6 +103,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: v${{ steps.meta.outputs.version }}
           tag: v${{ steps.meta.outputs.version }}
+          prerelease: ${{ steps.check_prerelease.outputs.prerelease }}
           body: |
             # v${{ steps.meta.outputs.version }}
 
